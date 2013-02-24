@@ -1,7 +1,10 @@
 MATH340-Notes
 =============
+
 Course: Math 340 - Discrete Structures 2
+
 Professor: Bruce Shepherd
+
 Term: Winter 2013
 
 Notes taken by Catherine Hilgers and typed up into latex by me (Ehsan Kia).
