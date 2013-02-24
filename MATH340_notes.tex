@@ -1,0 +1,666 @@
+\documentclass[11pt, letterpaper, oneside]{article}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+\setlength{\headwidth}{500pt}
+\pagestyle{fancyplain}
+
+\usepackage[shortlabels]{enumitem}
+\usepackage{wrapfig}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage[parfill]{parskip} 
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{cancel}
+\usepackage[linktoc=section, colorlinks=true, linkcolor=blue, urlcolor=blue]{hyperref}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing, matrix, arrows}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+
+\newcommand{\bigO}{\ensuremath{\mathcal{O}}}% big-O notation/symbol
+
+\title{MATH 340 - Discrete Structures 2}
+\author{McGill University -  Winter 2013}
+\date{Last Updated: \today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\addcontentsline{toc}{section}{Information}
+
+\section*{Information}
+
+\begin{itemize}
+	\item Instructor: \href{http://www.math.mcgill.ca/bshepherd/}{Bruce Shepherd}
+	\item LaTeX: Ehsan Kia
+	\item Notes: Catherine Hilgers
+\end{itemize}
+
+\section{Summary of Graph Theory Terms}
+A (simple) graph $G$ is an ordered pair $(V(G),E(G))$, sometimes written $(V,E)$, where $V(G)$ is a finite set of \textit{vertices} (aka nodes), and $E(G)$ is a finite set of edges. 
+
+Each edge is of the form $\{u,v\}$ sometimes written $uv$, where $u \ne v$ are two vertices that are the end points of the edge.
+
+\textsc{Note}: simple, undirected graph mean that we have no:
+\begin{figure}[H]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[Loops]{
+		\begin{tikzpicture}
+		\node [draw,fill,circle,minimum size=.15cm] (r) at (0,0) {} ;
+		\path (r) edge[ out=120, in=50, loop, distance=1.5cm] (r);
+		\end{tikzpicture}
+	} \hspace*{2cm}
+	\subfigure[Multiple edges]{
+		\begin{tikzpicture}[scale=0.75]
+		\node [draw,fill,circle,minimum size=.15cm] (l) at (0,0) {} ;
+		\node [draw,fill,circle,minimum size=.15cm] (r) at (2,0) {} ;
+		\path (l) edge[out=60, in=120, loop, distance=0.5cm] (r);
+		\path (l) edge[out=-60, in=-120, loop, distance=0.5cm] (r);
+		\path (l) edge[out=0, in=180, loop, distance=0.5cm] (r);
+		\end{tikzpicture}
+	} \hspace*{2cm}
+	\subfigure[Direction]{
+		\begin{tikzpicture}
+		\setlength{\arrowsize}{5cm}
+		\node [draw,fill,circle,inner sep=3pt] (l) at (0,0) {} ;
+		\node [draw,fill,circle,inner sep=3pt] (r) at (2,0) {} ;
+		\path (l) edge[out=0, in=180, loop, distance=0.5cm, -angle 90] (r);
+		\end{tikzpicture}
+	}
+\end{figure}
+
+\subsection{Special Graphs}
+
+\begin{figure}[H]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[Path]{
+		\begin{tikzpicture}
+			\draw[fill=black] (-2,0) circle (2pt) -- (-1,1) circle (2pt) -- (0,-1) circle (2pt)  -- (1,0) circle (2pt) -- (0,2) circle (2pt);
+		\end{tikzpicture}
+	}
+	\subfigure[Cycle]{
+		\begin{tikzpicture}[scale=0.75]
+		\draw[fill=black] (-1,0) circle (2pt) -- (2,1) circle (2pt) -- (3,-1) circle (2pt)  -- (1,-1) circle (2pt)
+		-- (4,-3) circle (2pt) -- (0,-4) circle (2pt)  -- (-1,0) circle (2pt);
+		\end{tikzpicture}
+	}
+	\subfigure[Complete graph]{
+		\begin{tikzpicture}
+			\draw (18:2cm) -- (90:2cm) -- (162:2cm) -- (234:2cm) -- (306:2cm) -- cycle;
+			\draw (18:2cm) -- (162:2cm) -- (306:2cm) -- (90:2cm) -- (234:2cm) -- cycle;
+			\draw[fill=black] (0:0cm) circle (2pt);
+			\foreach \x in {18,90,162,234,306}{
+				\draw (\x:0cm) -- (\x:2cm);
+				\draw[fill=black] (\x:2cm) circle (2pt);
+			}
+		\end{tikzpicture}
+	}
+	\subfigure[Petersen graph]{
+		\begin{tikzpicture}
+		\draw (18:2cm) -- (90:2cm) -- (162:2cm) -- (234:2cm) -- (306:2cm) -- cycle;
+		\draw (18:1cm) -- (162:1cm) -- (306:1cm) -- (90:1cm) -- (234:1cm) -- cycle;
+		\foreach \x in {18,90,162,234,306}{
+			\draw (\x:1cm) -- (\x:2cm);
+			\draw[fill=black] (\x:2cm) circle (2pt);
+			\draw[fill=black] (\x:1cm) circle (2pt);
+		}
+		\end{tikzpicture}
+	}
+	\caption{Examples of simple graphs}
+\end{figure}	
+
+\begin{wrapfigure}{r}{0.20\textwidth}
+	\vspace*{-1cm}
+	\setlength{\abovecaptionskip}{4pt}
+	\begin{tikzpicture}[scale=0.5]
+		\draw (-1,0) -- (0,-1) -- (1,0) -- (0,1);
+		\draw (-1,-2) -- (0,-1) -- (1,-2) -- (2,-3) -- (3,-2) -- (2,-1) -- (4,-3);
+		\draw (4,-1) -- (1,-4) -- (2,-3) -- (3,-4);
+	\end{tikzpicture}
+	\caption{A tree}
+	\label{tree}
+\end{wrapfigure}
+
+A graph is \textit{connected} if $\forall \; i,j \in V, \exists$ a path between them.
+
+A \textit{tree} is a connected graph with no cycles (Figure~\ref{tree}).
+
+A \textit{component} of $G$ is a maximal connected subgraph.
+
+The \textit{degree} of a vertex $v$ is the number of edges of which it is an endpoint, denoted by $deg_G(v)$ or $d_G(v)$.
+
+	
+
+\section{Stable Marriages}
+We have $n$ boys and $n$ girls. Each boy has an ordered list of girls and vice versa.
+
+A set $M$ of marriages is \textit{stable} if there is no boy-girl pair who prefer each other to their current pairings in $M$. We call this situation an unstable (unblocking) pair [Figure~\ref{unstable_pair}].
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[scale=1.5]
+	\node (v1) at (0,2) {$B_i$};
+	\node (v2) at (4,2) {$G_i$};
+	\node (v3) at (0,0) {$B_j$};
+	\node (v4) at (4,0) {$G_j$};
+	\draw[Green,thick]  (v1) edge node[auto]{married} (v2);
+	\draw[Green,thick]  (v3) edge node[auto]{married} (v4);
+	\draw[red,thick,]  (v3) edge node[pos=0.6,auto,sloped]{prefers} (v2);
+	\end{tikzpicture}
+	\caption{\textbf{Unstable pair} $B_j$ prefers $G_i$ to $G_j$ and $G_i$ prefers $B_j$ to $B_i$}
+	\label{unstable_pair}
+\end{figure}
+
+\subsection{Example}
+In the following example [Figure~\ref{example_marriage}], we have 3 boys and 3 girls, each with their own preference list, but the given matching isn't a stable marriage.
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+	\node[left,blue] (v1) at (0,0) {Adam};
+	\node[right,magenta] (v2) at (3,0) {Amalia};
+	\node[left,blue] (v3) at (0,-1) {Bob};
+	\node[right,magenta] (v4) at (3,-1) {Bernice};
+	\node[left,blue] (v5) at (0,-2) {Chris};
+	\node[right,magenta] (v6) at (3,-2) {Carol};
+	\node at (0,1) {\textbf{Boys}};
+	\node at (3,1) {\textbf{Girls}};
+	\draw[Green]  (v1) edge (v2);
+	\draw[Green]  (v3) edge (v4);
+	\draw[Green]  (v5) edge (v6);
+	\draw[red]  (v2) edge (v3);
+	\node[left,font=\small] at (-2,0) {$G_A \ge G_B \ge G_C$};
+	\node[left,font=\small] at (-2,-1) {$G_C \ge G_A \ge G_B$};
+	\node[left,font=\small] at (-2,-2) {$G_B \ge G_C \ge G_A$};
+	\node[right,font=\small] at (5,0) {$B_C \ge B_B \ge B_A$};
+	\node[right,font=\small] at (5,-1) {$B_B \ge B_C \ge B_A$};
+	\node[right,font=\small] at (5,-2) {$B_A \ge B_B \ge B_C$};
+	\end{tikzpicture}
+	\caption{Unstable because Amalia and Bob prefer each other over their current partner}
+	\label{example_marriage}
+\end{figure}
+
+But when trying again, we can easily find two stable configuations [Figure~\ref{stable_configs}]	
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[scale=1.5]
+	\node[left,blue] (v1) at (0,0) {A};
+	\node[right,magenta] (v2) at (2,0) {A};
+	\node[left,blue] (v3) at (0,-1) {B};
+	\node[right,magenta] (v4) at (2,-1) {B};
+	\node[left,blue] (v5) at (0,-2) {C};
+	\node[right,magenta] (v6) at (2,-2) {C};
+	\node at (0,1) {\textbf{Boys}};
+	\node at (2,1) {\textbf{Girls}};
+	\draw[green]  (v1) edge (v2);
+	\draw[green]  (v3) edge (v6);
+	\draw[green]  (v5) edge (v4);
+	\node at (1,2) {Boy-optimal};
+	
+	\node[left,blue] (vv1) at (5,0) {A};
+	\node[right,magenta] (vv2) at (7,0) {A};
+	\node[left,blue] (vv3) at (5,-1) {B};
+	\node[right,magenta] (vv4) at (7,-1) {B};
+	\node[left,blue] (vv5) at (5,-2) {C};
+	\node[right,magenta] (vv6) at (7,-2) {C};
+	\node at (5,1) {\textbf{Boys}};
+	\node at (7,1) {\textbf{Girls}};
+	\node at (6,2) {Girl-optimal};
+	\draw[green]  (vv1) edge (vv6);
+	\draw[green]  (vv3) edge (vv4);
+	\draw[green]  (vv5) edge (vv2);
+	\end{tikzpicture}
+	\caption{These work because each boy prefers a different girl, and each girl prefers a different boy.}
+	\label{stable_configs}
+\end{figure}
+
+
+\subsection{Gale-Shapley}
+
+Do stable matchings exist in general?
+
+\textbf{Theorem (Gale \& Shapley):} A stable matching always exists
+
+\textbf{Proof (by algorithm):} While there is some ``single'' boy $B$, $B$ proposes to the next girl on his list, call her $G$. Girl $G$ accepts if she is single or prefers $B$ to her current fianc\'e. Claim is that the algorithm terminates for any set of lists with a stable matching.
+
+\textsc{Note}: as the algorithm proceeds, girls' choices only get better and mens' only get worse. Each time a girl changes fianc\`e, she trades up. A boy only changes if he gets dumped by $G$ and he then proposes to the next girl on his list.
+
+\begin{wrapfigure}{l}{0.25\textwidth}
+	\setlength{\abovecaptionskip}{4pt}
+	\begin{tikzpicture}[scale=0.5]
+	\node (rect1) at (2,0) [draw,minimum width=2cm,minimum height=0.5cm] {};
+	\node (rect2) at (2,1) [draw,minimum width=2cm,minimum height=0.5cm] {};
+	\node (rect3) at (2,2) [draw,minimum width=2cm,minimum height=0.5cm] {};
+	\node (rect4) at (2,4) [draw,minimum width=2cm,minimum height=0.5cm] {};
+	\node (rect5) at (2,5) [draw,minimum width=2cm,minimum height=0.5cm] {};
+	\node (rect6) at (2,6) [draw,minimum width=2cm,minimum height=0.5cm] {};
+	
+	\draw[decorate,decoration={brace,amplitude=10pt,raise=35pt}, thick] (rect1) -- (rect6) node [black,midway,xshift=-50] {\footnotesize$n$};
+	\node[rotate=90] at (2,3) {...};
+	\node (v1) at (6,5) {};
+	\node (v2) at (4,5) {};
+	\draw[-latex,thick,blue] (v1) -- (v2);
+	\node at (2,7) {List};
+	\end{tikzpicture}
+	\caption{Preference list}
+	\label{preference_list}
+	\vspace*{-1cm}
+\end{wrapfigure}
+
+\textbf{Corollary:} The algorithm terminates. Say boy $B$ has his list. The pointer aims at his current match. There are $n$ boys and $n$ possible pointers into their lists [Figure~\ref{preference_list}]. each dumping moves the pointer down the list by one. We have $\leq n^2$ total dumpings. The algorithm terminates after $\bigO(n^2)$.
+
+The matching returned by the algorithm is stable. Suppose $M$ is the output matching, and has unstable pair $(B_i,G_j)$, for a contradiction:
+\begin{itemize}
+	\item $B_i$ prefers $G_j$ to current match $G_i$
+	\item $G_j$ prefers $B_i$ to current match $B_j$
+\end{itemize}
+Since $B_i$ prefers $G_j$ to $G_i$, he proposed to her earlier and she either rejected him, or accepted and dumped him later. In either case, she was at some point matched to some $B_k$ she preferred to $B_i$. By observation, her partners only improved from that point on. Thus, she prefers $B_j$ to $B_k$ and $B_k$ to $B_i$ $\Rightarrow$ prefers $B_j$ to $B_i$ and $(B_i,G_j)$ is not unstable. $\Rightarrow\Leftarrow$ (contradiction)
+
+There can be many stable matchings. Let:
+$$ \mathcal{S} = \{M_1, M_2, ..., M_k\} $$
+be the set of all stable matchings. Call $G_j$ a \textit{valid partner} for $B_i$ if $(B_i,G_j)$ are matched in some $M_i \in \mathcal{S}$. For each $B$, let $G^+(B)$ be his most preferred valid partner.
+
+Remarkably, the boy-proposal algorithm matches each boy $B$ to $G^+(B)$. To show this, we require a lemma:
+
+\textbf{Lemma:} a girl never rejects a valid partner
+
+\textbf{Proof (by contradiction):} Suppose not. Consider the first time $G_j$ rejects a valid partner $B_i$. Say $(B_i,G_j)$ were matched in $M_t \in \mathcal{S}$. Say $G_j$ dumps $B_i$ for $B_j$ at that time. Say $(B_j,G_k)$ is a match in $M_t$ [Figure~\ref{marriage_contradiction}].
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[scale=1]
+	\node[font=\huge] at (-2, 2) {$M_t$:};
+	
+	\node (b1) at (0,2) {$B_i$};
+	\node (b2) at (4,2) {$G_j$};
+	\node (b3) at (0,0) {$B_j$};
+	\node (b4) at (4,0) {$G_k$};
+	\draw[Green,thick]  (b1) edge (b2);
+	\draw[Green,thick]  (b3) edge (b4);
+	
+	\node at (6,1) {then};
+	
+	\node (a1) at (8,2) {$B_i$};
+	\node (a2) at (12,2) {$G_j$};
+	\node (a3) at (8,0) {$B_j$};
+	\node (a4) at (12,0) {$G_k$};
+	\draw[Green,thick] (a3) edge (a2);
+	
+	\end{tikzpicture}
+	\caption{A valid partner being dumped by a girl in boy-proposal}
+	\label{marriage_contradiction}
+\end{figure}
+
+Since $B_i$ is the first valid partner to be dumped, we claim $B_j$ prefers $G_j$ to $G_k$. Why? Supposed $B_j$ prefers $G_k$ to $G_j$. Thus he proposes first to $G_k$. But $(G_k,B_j) \in M_t$, and therefore $G_k$ is valid for $B_j$. But $B_j$ was as we supposed in the beginning the first valid person to be dumped, which means $B_j$ did not get dumped and $B-j$ is not free to propose to $G_j$. $\Rightarrow\Leftarrow$
+
+So $B_j$ prefers $G_j$ to $G_k$ and $G_j$ prefers $B_j$ to $B_i$, therefore $(B_i,G_j)$ is unstable in $M_t$. But $M_t \in \mathcal{S}$ and in thus stable. $\Rightarrow\Leftarrow$. Hence a girl never rejects a valid partner. 
+
+{\hfill $\blacksquare$}
+
+Now we will show that the boy-proposal algorithm matches each boy $B$ with $G^+(B)$.
+
+\textbf{Proof:} If $B_i$ is matched by algorithm to $G_j$, who he doesn't like as much as $G^+(B_i)$, then he proposed to $G^+(B_i)$ first. But $G^+(B_i)$ and $B_i$ are valid, hence $G^+(B_i)$couldn't have rejected him. $\Rightarrow\Leftarrow$
+
+Let $B^-(G_j)$ be the worst partner for $G_j$ amongst all stable matchings.
+
+\textbf{Lemma:} The boy-proposal algorithm matches each $G_j$ to $B^-(G_j)$.
+
+\textbf{Proof:} Supposed $B_j$ and $G_j$ are matched, whom she prefers to $B^-(G_j)$. Say $(G_j,B^-(G_j)) \in M_r$ and $(G_i,B_j) \in M_r$ [Figure~\ref{worst_partner}].
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[scale=1]
+	\node[font=\huge] at (-2, 2) {$M_r$:};
+	
+	\node (b1) at (0,2) {$G_j$};
+	\node (b2) at (4,2) {$B^-(G_j)$};
+	\node (b3) at (0,0) {$G_i$};
+	\node (b4) at (4,0) {$B_j$};
+	\draw[Green,thick]  (b1) edge (b2);
+	\draw[Green,thick]  (b3) edge (b4);
+	\draw[red,thick]  (b1) edge (b4);
+	
+	\end{tikzpicture}
+	\caption{By the previous, $B_j$ gets $G^+(B_j)$, so $G_j = G^+(B_j)$}
+	\label{worst_partner}
+\end{figure}
+
+Thus, $B_j$ prefers $G_j$ to $G_i$ and $G_j$ prefers $B_j$ to $B^-(G_j)$, therefore the valid pair $(B_i,G_j)$ is unstable in $M_r$. $\Rightarrow\Leftarrow$. It follows that $G_j$ gets $B^-(G_j)$ with boy proposal.
+
+{\hfill $\blacksquare$}
+
+\subsection{Matching}
+
+A \textit{matching} in a graph $G(V,E)$ is a set $M \subseteq E$ of vertex-disjoint edges, i.e., each vertex of $G$ is the endpoint of at most one edge in $M$.
+
+we say $v \in V$ is \textit{matched} (or \textit{saturated}) by $M$ if it is the endpoint of some edges in $M$. Otherwise, it is \textit{unmatched}. A path $P$ is \textit{M-alternating} if its edges are alternatively in $M$ and not in $M$.
+
+An alternating path is \textit{M-augmenting} if its endpoints are unmatched.
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+	\vspace*{-1cm}
+	\begin{tikzpicture}[scale=0.8]
+	\tikzset{filled/.style={fill=blue!20, draw=blue!50, thick}, outline/.style={draw=blue!50, thick}}
+	
+	\draw[filled, even odd rule] (0,0) circle (1.5cm) node[left] {$M$}
+	(0:1.8cm) circle (1.5cm) node[right] {$E(P)$};
+	\end{tikzpicture}
+	\caption{Symmetric difference of $M$ and $E(P)$}
+	\label{xor}
+	\vspace*{-1cm}
+\end{wrapfigure}
+
+\textbf{Theorem:} A matching in $G$ is of maximum cardinality $\iff$ there is no M-augmenting path.
+
+\textbf{Proof:}($\Rightarrow$) Suppose $P$ is an M-augmenting path, then switching the edges in $P$ produces a larger matching. Let $M' = M \oplus E(P)$ (Symmetric difference of $M$ and the edges in the path $P$).
+
+\begin{align*}
+	M \oplus E(P) &= (M \cup E(P)) - (M \cap E(P)) \\
+	&= (M - E(P)) \cup (E(P) - M)
+\end{align*}
+
+\begin{figure}[h]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[$M$ has matching of size 3]{
+		\begin{tikzpicture}
+			\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+			\node[v] (v0) at (0,0) {};
+			\node[v] (v1) at (1,0) {};
+			\node[v] (v2) at (1,1) {};
+			\node[v] (v3) at (2,1) {};
+			\node[v] (v4) at (2,2) {};
+			\node[v] (v5) at (3,2) {};
+			\node[v] (v6) at (3,3) {};
+			\node[v] (v7) at (4,3) {};
+			\draw[green]  (v1) edge (v2);
+			\draw[green]  (v3) edge (v4);
+			\draw[green]  (v5) edge (v6);
+			\draw  (v0) edge (v1);
+			\draw  (v2) edge (v3);
+			\draw  (v4) edge (v5);
+			\draw  (v6) edge (v7);
+		\end{tikzpicture}
+	} \hspace*{2cm}
+	\subfigure[$M'$ has matching of size 4]{
+		\begin{tikzpicture}
+			\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+			\node[v] (v0) at (0,0) {};
+			\node[v] (v1) at (1,0) {};
+			\node[v] (v2) at (1,1) {};
+			\node[v] (v3) at (2,1) {};
+			\node[v] (v4) at (2,2) {};
+			\node[v] (v5) at (3,2) {};
+			\node[v] (v6) at (3,3) {};
+			\node[v] (v7) at (4,3) {};
+			\draw  (v1) edge (v2);
+			\draw  (v3) edge (v4);
+			\draw  (v5) edge (v6);
+			\draw[green]  (v0) edge (v1);
+			\draw[green]  (v2) edge (v3);
+			\draw[green]  (v4) edge (v5);
+			\draw[green]  (v6) edge (v7);
+		\end{tikzpicture}
+	}
+\end{figure}
+
+($\Leftarrow$) Suppose $M$ has no augmenting path. Claim that it is a maximum matching. Suppose not, and that $M^*$ is a maximum matching where $|M^*| > |M|$. Consider $M \oplus M^*$. Let $H$ be the subgraph induced by the edges.
+
+Claim:
+\begin{align*}
+	|M| &= \text{\# of $M$ -edges} \, \in H + |M \cap M^*| \\
+		&= \text{\# of $M^*$-edges} \in H + |M \cap M^*| \\
+\end{align*}
+
+What is the degre of any vertex in $H$? It's at most two, since each vertex is incident to at most one edge in $M$ and at most one edge in $M^*$. $deg_H(v) \in \{0,1,2\}$.
+
+What does $H$ look like?
+
+\begin{figure}[h]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[$d_H(v)=0 \;\; \forall \;\; v$]{
+		\begin{tikzpicture}[scale=0.8]
+			\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+			\foreach \x/\y in {0/-1, 1/0, 0/1, 3/1, 2/-1, -2/1, -1/0, 2/2, -1/2, 3/0, 1/3}{
+				\node[v] at (\x,\y) {};
+			}
+		\end{tikzpicture}
+	} \hspace*{1cm}
+	\subfigure[$d_H(v) \in \{0, 1\} \;\; \forall \;\; v$]{
+		\begin{tikzpicture}[scale=0.8]
+			\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+			\foreach \x/\y in {0/-1, 1/0, 0/1, 3/1, 2/-1, -2/1, -1/0, 2/2, -1/2, 3/0, 1/3}{
+				\node[v] at (\x,\y) {};
+			}
+			\draw (0,-1) -- (1,0);
+			\draw (3,1) -- (3,0);
+			\draw (-1,0) -- (-1,2);
+		\end{tikzpicture}
+	} \hspace*{1cm}
+	\subfigure[$d_H(v) \in \{0, 1\} \;\; \forall \;\; v$]{
+		\begin{tikzpicture}[scale=0.8]
+			\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+			\foreach \x/\y in {0/-1, 1/0, 0/1, 3/1, 2/-1, -2/1, -1/0, 2/2, -1/2, 3/0, 1/3}{
+				\node[v] at (\x,\y) {};
+			}
+			\draw (0,-1) -- (1,0) -- (2,-1) -- cycle;
+			\draw (-1,2) -- (1,3) -- (2,2);
+			\draw (3,1) -- (3,0);
+			\draw (-1,0) -- (-2,1);
+		\end{tikzpicture}
+	}
+\end{figure}
+
+Say \textcolor{blue}{blue} is $M$ and \textcolor{green}{green} is $M^*$. They alternate:
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+	\node[v] (v0) at (0,0) {};
+	\node[v] (v1) at (1,1) {};
+	\node[v] (v2) at (2,0) {};
+	\node[v] (v3) at (3,1) {};
+	\node[v] (v4) at (4,0) {};
+	\node[v] (v5) at (5,1) {};
+	\draw[blue]  (v1) edge (v2);
+	\draw[blue]  (v3) edge (v4);
+	\draw[green]  (v0) edge (v1);
+	\draw[green]  (v2) edge (v3);
+	\draw[green]  (v4) edge (v5);
+	\end{tikzpicture}
+\end{figure}
+
+This means that a cycle must be even:
+
+\begin{figure}[H]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[No]{
+		\begin{tikzpicture}
+		\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+			\node[v] (v0) at (0:2) {};
+			\node[v] (v1) at (72:2) {};
+			\node[v] (v2) at (144:2) {};
+			\node[v] (v3) at (216:2) {};
+			\node[v] (v4) at (288:2) {};
+			\node[v] (v5) at (0:2) {};
+			\draw[blue]  (v1) edge (v2);
+			\draw[blue]  (v3) edge (v4);
+			\draw[green]  (v0) edge (v1);
+			\draw[green]  (v2) edge (v3);
+			\draw[green]  (v4) edge (v5);
+		\end{tikzpicture}
+	} \hspace*{2cm}
+	\subfigure[Yes]{
+		\begin{tikzpicture}
+			\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+			\node[v] (v0) at (0:2) {};
+			\node[v] (v1) at (60:2) {};
+			\node[v] (v2) at (120:2) {};
+			\node[v] (v3) at (180:2) {};
+			\node[v] (v4) at (240:2) {};
+			\node[v] (v5) at (300:2) {};
+			\node[v] (v6) at (0:2) {};
+			\draw[blue]  (v1) edge (v2);
+			\draw[blue]  (v3) edge (v4);
+			\draw[blue]  (v5) edge (v6);
+			\draw[green]  (v0) edge (v1);
+			\draw[green]  (v2) edge (v3);
+			\draw[green]  (v4) edge (v5);
+		\end{tikzpicture}
+	}
+\end{figure}
+
+Each component is either
+
+\begin{itemize}
+	\item an even cycle
+	\item a path
+\end{itemize}
+
+Since alternating an even cycle doesn't change the size of $M$ nor $M^*$, we will focus on paths.
+
+Consider the 3 following types of paths:
+\begin{enumerate}
+	\item $M^*$-augmenting
+	\item $M$-augmenting
+	\item augments nothing
+\end{enumerate}
+
+\begin{figure}[H]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[Type 1]{
+		\begin{tikzpicture}[scale=0.9]
+		\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+		\node[v] (v0) at (0,0) {};
+		\node[v] (v1) at (1,1) {};
+		\node[v] (v2) at (2,0) {};
+		\node[v] (v3) at (3,1) {};
+		\node[v] (v4) at (4,0) {};
+		\node[v] (v5) at (5,1) {};
+		\draw[green]  (v1) edge (v2);
+		\draw[green]  (v3) edge (v4);
+		\draw[blue]  (v0) edge (v1);
+		\draw[blue]  (v2) edge (v3);
+		\draw[blue]  (v4) edge (v5);
+		\end{tikzpicture}
+	} \hspace*{1cm}
+	\subfigure[Type 2]{
+		\begin{tikzpicture}[scale=0.9]
+		\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+		\node[v] (v0) at (0,0) {};
+		\node[v] (v1) at (1,1) {};
+		\node[v] (v2) at (2,0) {};
+		\node[v] (v3) at (3,1) {};
+		\node[v] (v4) at (4,0) {};
+		\node[v] (v5) at (5,1) {};
+		\draw[blue]  (v1) edge (v2);
+		\draw[blue]  (v3) edge (v4);
+		\draw[green]  (v0) edge (v1);
+		\draw[green]  (v2) edge (v3);
+		\draw[green]  (v4) edge (v5);
+		\end{tikzpicture}
+	} \hspace*{1cm}
+	\subfigure[Type 3]{
+		\begin{tikzpicture}[scale=0.9]
+		\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+		\node[v] (v0) at (0,0) {};
+		\node[v] (v1) at (1,1) {};
+		\node[v] (v2) at (2,0) {};
+		\node[v] (v3) at (3,1) {};
+		\node[v] (v4) at (4,0) {};
+		\draw[blue]  (v1) edge (v2);
+		\draw[blue]  (v3) edge (v4);
+		\draw[green]  (v0) edge (v1);
+		\draw[green]  (v2) edge (v3);
+		\end{tikzpicture}
+	}
+\end{figure}
+
+There are no type 1 paths since they are $M^*$-augmenting and we assumed $M^*$ was maximum! (See $\Rightarrow$ path of the proof). Each type 3 path, similarly to the cycle components, have the same number $M$ and $M^*$ edges. But, by the claim, $H$ must have more $M^*$ edges than $M$-edges. Therefore there is a type 2 component, and thus is an $M$-augmenting path. $\Rightarrow\Leftarrow$
+
+{\hfill $\blacksquare$}
+
+\textsc{Note:} This theorem holds for all graphs.
+
+\subsection{Matching in Bipartite Graph}
+
+$G$ is bipartite if there is a partition $V(G)= X \cup Y$, such that each edge has one endpoint in $Z$ and the other in $Y$ (figure~\ref{bipartite_graph}).
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\draw[green] (0,0) ellipse (1cm and 3cm);
+		\draw[blue] (5,0) ellipse (1cm and 3cm);
+		\node[green] at (0,2) {X};
+		\node[blue] at (5,2) {Y};
+		\draw (0,0) -- (5,-2);
+		\draw (0,1) -- (5,1);
+		\draw (0,-2) -- (5,-2);
+		\draw (0,-1) -- (5,1);
+		\draw (0,0) -- (5,-1);
+	\end{tikzpicture}
+	\caption{Bipartite graph partitioned into vertex set $X$ and $Y$}
+	\label{bipartite_graph}
+\end{figure}
+
+\begin{wrapfigure}{r}{0.2\textwidth}
+	\begin{tikzpicture}[thick,scale=0.5]
+	\draw[green] (0,0) ellipse (1cm and 3cm);
+	\draw[blue] (5,0) ellipse (1cm and 3cm);
+	\draw[red] (0,-1) ellipse (0.5cm and 1.5cm);
+	\draw (5,-0.5) ellipse (0.5cm and 2cm);
+	\node[green] at (0,2) {X};
+	\node[blue] at (5,2) {Y};
+	\node[red] at (-0.7,0) {A};
+	\node[fill=white] at (6.7,1) {N(A)};
+	\draw (0,0) -- (5,-2);
+	\draw (0,1) -- (5,1);
+	\draw (0,-2) -- (5,-2);
+	\draw (0,-1) -- (5,1);
+	\draw (0,0) -- (5,-1);
+	\end{tikzpicture}
+\end{wrapfigure}
+
+\textbf{Theorem:} $G$ is bipartite $\iff$ it has no odd cycles.
+
+\textbf{Definition:} A matching is perfect if it matches each vertex of $G$ (we can only have degree 1 matching here).
+
+Fundamental question: ``When does a graph have a perfect matching?''
+
+\textbf{Definition:} For $A \in V$, denote by $N(A)$ the set of neighbors of $A$, i.e., $N(A) =\{v \not\in A: \exists \; uv \in E, u \in A \}$
+
+\textbf{Hall's Theorem:} A bipartite graph $G$ with $|X|=|Y|$ has a perfect matching $\iff$ $|N(A)\geq|A| \; \forall \; A \subseteq X$. (Known as Hall's condition)
+
+\textbf{Proof:} ($\Rightarrow$) Trivially holds since we can't have this:
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[thick,scale=1]
+		\draw[green] (0,0.8) ellipse (1cm and 1.8cm);
+		\draw[blue] (4,0.8) ellipse (1cm and 1.8cm);
+		\draw[red] (0,0.5) ellipse (0.5cm and 1cm);
+		\draw (4,0.5) ellipse (0.5cm and 1cm);
+		\node[green] at (0,3) {X};
+		\node[blue] at (4,3) {Y};
+		\node[red] at (0,1.8) {A};
+		\node at (4,1.8) {N(A)};
+		\draw (0,0) -- (4,0.5);
+		\draw (0,1) -- (4,0.5);
+	\end{tikzpicture}
+	\caption{The two vertices in $A$ have only one possible vertex they can match with, therefore there is no perfect matching that would match both.}
+\end{figure}
+
+($\Leftarrow$) Supposed $G$ is satisfying Hall's condition. If $M$ is some matching with an unmatched vertex $u \in X$, we show how to make it bigger.
+
+\end{document}
