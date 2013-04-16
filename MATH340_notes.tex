@@ -15,6 +15,7 @@
 \usepackage{amssymb}
 \usepackage{fullpage}
 \usepackage{cancel}
+\usepackage{caption}
 \usepackage[linktoc=section, colorlinks=true, linkcolor=blue, urlcolor=blue]{hyperref}
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{tikz}
@@ -43,11 +44,36 @@
 \end{itemize}
 
 \section{Summary of Graph Theory Terms}
-A (simple) graph $G$ is an ordered pair $(V(G),E(G))$, sometimes written $(V,E)$, where $V(G)$ is a finite set of \textit{vertices} (aka nodes), and $E(G)$ is a finite set of edges. 
+A (simple) graph $G$ is an ordered pair $(V(G),E(G))$, sometimes written $(V,E)$, where $V(G)$ is a finite set of vertices (aka nodes), and $E(G)$ is a finite set of edges. 
 
-Each edge is of the form $\{u,v\}$ sometimes written $uv$, where $u \ne v$ are two vertices that are the end points of the edge.
+Each edge is of the form $\{u,v\}$ sometimes written $uv$, where $u \ne v$ are two vertices that are the end points of the edge. An edge $e \in E$ is \textit{incident} to a vertex $v \in V$ if $e=(u,v)$ for some $u \in V$. A vertex $v \in V$ is called \textit{adjacent} to a vertex $u \in V$ if $(u,v) \in E$.
 
-\textsc{Note}: simple, undirected graph mean that we have no:
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}[scale=2]
+		\tikzstyle{v}=[circle,fill=black,inner sep=2pt,text=white]
+		\node[v] (v1) at (-4,1) {1};
+		\node[v] (v2) at (-3,2) {2};
+		\node[v] (v3) at (-3,0) {3};
+		\node[v] (v4) at (-2,1) {4};
+		\node[v] (v5) at (-1,1) {5};
+		\node[v] (v6) at (0,2) {6};
+		\node[v] (v7) at (0,0) {7};
+		\draw  (v1) edge (v2);
+		\draw  (v2) edge (v4);
+		\draw  (v1) edge (v3);
+		\draw  (v3) edge (v2);
+		\draw  (v4) edge (v3);
+		\draw  (v5) edge (v6);
+		\draw  (v5) edge (v7);
+		\draw  (v4) edge[out=30, in=150] (v5);
+		\draw  (v4) edge[out=-30, in=-150] (v5);
+		\draw  (v2) edge[loop, looseness=10] (v2);
+	\end{tikzpicture}
+	\caption{Example of a graph where $V = \{1,2,3,4,5,6,7\}$}
+\end{figure}
+
+\textsc{Note}: simple, undirected graph mean that we have no: \nopagebreak
 \begin{figure}[H]
 	\centering
 	\setcounter{subfigure}{0}
@@ -61,8 +87,8 @@ Each edge is of the form $\{u,v\}$ sometimes written $uv$, where $u \ne v$ are t
 		\begin{tikzpicture}[scale=0.75]
 		\node [draw,fill,circle,minimum size=.15cm] (l) at (0,0) {} ;
 		\node [draw,fill,circle,minimum size=.15cm] (r) at (2,0) {} ;
-		\path (l) edge[out=60, in=120, loop, distance=0.5cm] (r);
-		\path (l) edge[out=-60, in=-120, loop, distance=0.5cm] (r);
+		\path (l) edge[out=50, in=130, loop, distance=0.5cm] (r);
+		\path (l) edge[out=-50, in=-130, loop, distance=0.5cm] (r);
 		\path (l) edge[out=0, in=180, loop, distance=0.5cm] (r);
 		\end{tikzpicture}
 	} \hspace*{2cm}
@@ -76,8 +102,68 @@ Each edge is of the form $\{u,v\}$ sometimes written $uv$, where $u \ne v$ are t
 	}
 \end{figure}
 
-\subsection{Special Graphs}
+Suppose we have $H=(V(H), E(H))$ such that:
+\begin{enumerate}[i)]
+	\item $V(H) \subseteq V(G)$
+	\item $E(H) \subseteq E(G)$
+	\item $\forall \; e=(u,v) \in E(H): u, v \in V(H)$
+\end{enumerate}
 
+Then, $H$ is a \textit{subgraph} of $G$.
+
+Given a set $S \subset V$, we define the \textit{subgraph induced by $S$} to be the graph denoted by $G[S]$ to be a subgraph of $G$ whose vertex set is $S$ and whose edge set is the set of edges with both ends in $S$.
+
+Similarly, for $F \subset E$, define the subgraph induced by $F$, denoted $G[F]$, to be the subgraph of $G$ whose edge set is $F$ and whose vertex set is the set of all endpoints in $F$.
+
+
+\subsection{Terminology}
+The \textit{degree} of a vertex $v$ is the number of edges of which it is an endpoint, denoted by $deg_G(v)$.
+
+A \textit{walk} of a graph $G$ is a sequence of alternating vertices and edges $v_0 e_1 v_1 e_2 ... v_{n-1} e_n v_n$ such that $e_i$ is incident to $v_{i-1}$ and $v_i$, $\forall \; i=1, ..., n$, where $n$ is the length of the walk.
+
+A \textit{trail} is a walk in which the edges are distinct.
+
+A \textit{path} is a trail in which vertices are distinct.
+
+A \textit{cycle} is a trail of length at least 1 in which the vertices are distinct, except $v_0$ and $v_n$ which are the same.
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+	\tikzstyle{v}=[circle,fill=black,inner sep=0pt]
+	\node[v] (v1) at (-0.5,0) {1};
+	\draw  (v1) edge[loop, looseness=10] (v1);
+	\node at (-0.5,-0.5) {$c_1$};
+	\node[v] (v2) at (1,0) {1};
+	\node[v] (v3) at (2,1) {1};
+	\draw  (v3) edge[in=90, out=180, loop, looseness=1] (v2);
+	\draw  (v3) edge[in=0, out=-90, loop, looseness=1] (v2);
+	\node at (1.5,-0.5) {$c_2$};
+	\node[v] (v4) at (3,0) {1};
+	\node[v] (v5) at (3.5,1) {1};
+	\node[v] (v6) at (4,0) {1};
+	\draw  (v4) edge (v5);
+	\draw  (v5) edge (v6);
+	\draw  (v6) edge (v4);
+	\node at (3.5,-0.5) {$c_3$};
+	\node[v] (v7) at (5,0) {1};
+	\node[v] (v8) at (5,1) {1};
+	\node[v] (v9) at (6,1) {1};
+	\node[v] (v10) at (6,0) {1};
+	\draw  (v7) edge (v8);
+	\draw  (v8) edge (v9);
+	\draw  (v9) edge (v10);
+	\draw  (v10) edge (v7);
+	\node at (5.5,-0.5) {$c_4$};
+	\end{tikzpicture}
+	\caption{Cycles of size 1 to 4.}
+\end{figure}
+
+A graph is $connected$ if $\exists$ a path between any two vertices. Else, it's disconnected.
+
+A \textit{component} of $G$ is a maximal connected subgraph.
+
+\subsection{Special Graphs}
 \begin{figure}[H]
 	\centering
 	\setcounter{subfigure}{0}
@@ -129,15 +215,57 @@ Each edge is of the form $\{u,v\}$ sometimes written $uv$, where $u \ne v$ are t
 	\label{tree}
 \end{wrapfigure}
 
-A graph is \textit{connected} if $\forall \; i,j \in V, \exists$ a path between them.
-
 A \textit{tree} is a connected graph with no cycles (Figure~\ref{tree}).
 
-A \textit{component} of $G$ is a maximal connected subgraph.
+A graph $G$ is \textit{bipartite} if $\exists$ a partition $(X,Y)$ of $V(G)$ such that for every edge $e \in E(G)$, $e$ has one endpoint in $X$ and the other in $Y$. $X$ and $Y$ are called the \textit{parts} of $G$ and $(X,Y)$ is called the bipartition.
 
-The \textit{degree} of a vertex $v$ is the number of edges of which it is an endpoint, denoted by $deg_G(v)$ or $d_G(v)$.
+\textbf{Theorem:} $G$ is bipartite $\Leftrightarrow$ $G$ contains no odd cycles.
 
-	
+\textbf{Proof:} Without loss of generality, assume $G$ is connected, since $G$ is bipartite $\Rightarrow$ each of its components are.
+
+($\Rightarrow$) Suppose $G$ is bipartite, with bipartition $(X,Y)$. Let $v_0 e_1 v_1 e_2 ... e_n v_n$ be an odd cycle (n is odd). Assume $v_0 \in X$. We then show that for $0 \leq k < \frac{n}{2}$, $v_{2k} \in X$. Assume inductively that $V_{2k-2} \in X$, where $k \geq 1$. Then $v_{2k-1}$ lies in $Y$, since $e_{2k-1}$ has endpoints in both $X$ and $Y$. But $v_{2k-1}$ inplies $v_{2k} \in X$  for the same reason. In particular, $v_{n-1} \in X$, but this means the two endpoints of $e_n$, $v_0$ and $v_{n-1}$, both lie in $X$. This contradict the fact that $G$ is bipartite.
+
+\begin{wrapfigure}{l}{0.24\textwidth}
+	\begin{tikzpicture}[scale]
+		\tikzstyle{v}=[circle,fill=black,inner sep=0pt]
+		\node (v0) at (0,0.3) {v};
+		\node[v] (v1) at (0,0) {1};
+		\node[v] (v2) at (-1,-1.5) {1};
+		\node[v] (v3) at (0,-1.5) {1};
+		\node[v] (v4) at (1,-1.5) {1};
+		\node[v] (v5) at (-1,-3) {1};
+		\node[v] (v7) at (0,-3) {1};
+		\node[v] (v6) at (1,-3) {1};
+		\draw  (v1) edge (v2);
+		\draw  (v1) edge (v3);
+		\draw  (v4) edge (v1);
+		\draw  (v3) edge (v5);
+		\draw  (v3) edge (v6);
+		\draw  (v7) edge (v2);
+		\draw  (v4) edge (v7);
+		\node[green] at (-2,0) {$D_1$};
+		\node[green] at (-2,-1.5) {$D_2$};
+		\node[green] at (-2,-3) {$D_3$};
+		\draw[thick,green]  (0,0) ellipse (1.5 and 0.5);
+		\draw[thick,green]  (0,-1.5) ellipse (1.5 and 0.5);
+		\draw[thick,green]  (0,-3) ellipse (1.5 and 0.5);
+	\end{tikzpicture}
+	\vspace*{-1cm}
+\end{wrapfigure}
+
+($\Leftarrow$) Suppose $G$ contains no odd cycles. Let $v \in V$, and for all $u \in V$, define $d(v) =$ length of the shortest path from $u$ to $v$. Let $D_i = \{u \in V: d(u)=i\}$.
+
+Claim 1: $j \geq i+2 \Rightarrow$ there are no edges with endpoints in $D_i$ or $D_j$.
+
+Claim 2: any $i \geq 0$, there are no edges with both endpoints in $D_i$.
+
+Then, letting $X=\bigcup_{i \text{ even}} D_i$ and $Y=\bigcup_{i \text{ odd}} D_i$, then $(X,Y)$ forms a bipartition of $G$.
+
+\textbf{Proof of claim 1:} Suppose there were some vertices $u, v$, and integers $i, j$, such that $j \geq i+2$, $u \in D_i$, $w \in D_j$, and $uw \in E$. Then, a shortest path from $v$ to $w$ is no longer than the path by adjoining $uw$ to the shortest path from $v$ to $u$. So, $d(w) \leq i+1$. This contracting the fact that $w \in D_j$, that is, $d(w) \geq qi+1$.
+
+\textbf{Proof of claim 2:} Suppose there were some $i \geq 0$ and vertices $u,w \in D_i$ such that $uw \in D_i$. Then, $\exists$ two paths: $P_1 = (v=a_0,a_1,a_2,...,a_{i-1},u=a_i)$ and $P_2 = (v=b_0, b_1, b_2, ..., b_{i-1}, w=b_i)$. Let $m$ be thte largest index such that $a_k \ne b_k \; \forall \; m+1 \leq k \leq i$. Then, $a_m a_{m+1} ... a_{i-1} u w b_{i-1} ... b_{m+1} b_{m}$ is a cycle of length 2(i-m)+1, which is odd. $\Rightarrow\Leftarrow$.
+
+{\hfill $\blacksquare$}
 
 \section{Stable Marriages}
 We have $n$ boys and $n$ girls. Each boy has an ordered list of girls and vice versa.
@@ -197,12 +325,12 @@ But when trying again, we can easily find two stable configuations [Figure~\ref{
 	\node[right,magenta] (v4) at (2,-1) {B};
 	\node[left,blue] (v5) at (0,-2) {C};
 	\node[right,magenta] (v6) at (2,-2) {C};
-	\node at (0,1) {\textbf{Boys}};
-	\node at (2,1) {\textbf{Girls}};
+	\node at (0,0.5) {\textbf{Boys}};
+	\node at (2,0.5) {\textbf{Girls}};
 	\draw[green]  (v1) edge (v2);
 	\draw[green]  (v3) edge (v6);
 	\draw[green]  (v5) edge (v4);
-	\node at (1,2) {Boy-optimal};
+	\node at (1,1) {Boy-optimal};
 	
 	\node[left,blue] (vv1) at (5,0) {A};
 	\node[right,magenta] (vv2) at (7,0) {A};
@@ -210,9 +338,9 @@ But when trying again, we can easily find two stable configuations [Figure~\ref{
 	\node[right,magenta] (vv4) at (7,-1) {B};
 	\node[left,blue] (vv5) at (5,-2) {C};
 	\node[right,magenta] (vv6) at (7,-2) {C};
-	\node at (5,1) {\textbf{Boys}};
-	\node at (7,1) {\textbf{Girls}};
-	\node at (6,2) {Girl-optimal};
+	\node at (5,0.5) {\textbf{Boys}};
+	\node at (7,0.5) {\textbf{Girls}};
+	\node at (6,1) {Girl-optimal};
 	\draw[green]  (vv1) edge (vv6);
 	\draw[green]  (vv3) edge (vv4);
 	\draw[green]  (vv5) edge (vv2);
@@ -632,15 +760,13 @@ $G$ is bipartite if there is a partition $V(G)= X \cup Y$, such that each edge h
 	\end{tikzpicture}
 \end{wrapfigure}
 
-\textbf{Theorem:} $G$ is bipartite $\iff$ it has no odd cycles.
-
 \textbf{Definition:} A matching is perfect if it matches each vertex of $G$ (we can only have degree 1 matching here).
 
 Fundamental question: ``When does a graph have a perfect matching?''
 
 \textbf{Definition:} For $A \in V$, denote by $N(A)$ the set of neighbors of $A$, i.e., $N(A) =\{v \not\in A: \exists \; uv \in E, u \in A \}$
 
-\textbf{Hall's Theorem:} A bipartite graph $G$ with $|X|=|Y|$ has a perfect matching $\iff$ $|N(A)\geq|A| \; \forall \; A \subseteq X$. (Known as Hall's condition)
+\textbf{Theorem (Hall's):} A bipartite graph $G$ with $|X|=|Y|$ has a perfect matching $\iff$ $|N(A)\geq|A| \; \forall \; A \subseteq X$. (Known as Hall's condition)
 
 \textbf{Proof:} ($\Rightarrow$) Trivially holds since we can't have this:
 
@@ -661,6 +787,68 @@ Fundamental question: ``When does a graph have a perfect matching?''
 	\caption{The two vertices in $A$ have only one possible vertex they can match with, therefore there is no perfect matching that would match both.}
 \end{figure}
 
-($\Leftarrow$) Supposed $G$ is satisfying Hall's condition. If $M$ is some matching with an unmatched vertex $u \in X$, we show how to make it bigger.
+($\Leftarrow$) If we have some matching $M$ with unmatched vertex $u$, then we showed how to find an $M$-augmenting path from $u$. This gives a new matching which is larger. Repeat until you get a perfect matching.
+
+Algorithm to find $M$-augmenting path from u:
+
+Let $A = \{u\}, B=\emptyset$. Maintain two properties of $A$ and $B$ as we proceed.
+
+\begin{enumerate}[i)]
+	\item $A \subset X$, $B \subset Y$. $A-u$ matched to $B$ by $M$. (\textsc{n.b.} $|A|=|B|+1$)
+	\item There is an $M$-alternating path from $u$ to any vertex in $A-u$ in the graph $G[A \cup B]$. 
+\end{enumerate}
+
+Repeat:
+\begin{itemize}
+	\item Choose $v \in N(A)-B$. Let $e=wv, w \in A$. Combine an alternating path from $u$ to $w$ (by ii), with edge $e$, then get an $M$-augmenting path and quit.
+	\item if $v$ is matched to some $u' \in X-A$, and $u'$ not in $A$ by i), get $A \in A \cup \{u'\}$, $B \in B \cup \{v\}$. Clearly i) holds. Check that ii) holds (similar to previous argument).
+	\item We can always find another vertex because Hall's condition implies that $N(A) \geq |A| = |B| + 1 > |B|$.
+	
+This proof gives an algorithm for finding a perfect matching in $G$ if it satisfies the Hall Condition.
+
+\textsc{Note:} Runtime $\bigO(VE)$ steps. There exists faster algorithms.
+\end{itemize}
+
+\subsection*{Applications}
+
+A graph is \textit{d-regular} if every vertex has degree $d$.
+
+\textbf{Theorem:} Any d-regular bipartite graph can be decomposed into $d$ perfect matchings, i.e., the edges $E = M_1 \cup M_2 \cup ... \cup M_d$ where each $M_i$ is a perfect matching.
+
+\textbf{Proof:} It is enough to show that we have one perfect matching in $G$, since if $M$ is a perfect matching, then $G-M$ is a $(d-1)$-regular, and we can repeat.
+
+First, note that since each edge has one end in $X$ and one in $Y$:
+
+$$ \sum_{x \in X} deg(x) = |E| = \sum_{y \in Y}  deg(y) \Rightarrow |X|=|Y| $$
+
+We also have that $|E| = d|X| = d|Y|$ since $deg(x)=d \; \forall x \ in X$. Consider $A \subset X$:
+\begin{align*}
+	d|A| &=\sum_{x \in A} deg(x) \\
+		 &= \text{\# of edges with 1 end in } A \\
+		 &\leq \text{\# of edges with one end in } N(A) \\
+		 &= \sum_{y \in N(A)} deg(y) \\
+		 &= d|N(A)|
+\end{align*}
+
+Thus $|A| \leq |N(A)|$. So $G$ satisfies Hall's Condition and hence has a perfect matching.
+
+\subsubsection*{Latin Squares}
+An $r \times n$ grid is a \textit{Latin Rectangle} if the numbers in each row and column are distinct.
+
+\begin{wrapfigure}{r}{0.15\textwidth}
+	\caption*{Example}
+	\begin{tabular}{|c|c|c|c|}
+		\hline 1 & 2 & 3 & 4 \\ 
+		\hline 2 & 3 & 4 & 1 \\ 
+		\hline 4 & 1 & 2 & 3 \\ 
+		\hline 
+	\end{tabular}
+\end{wrapfigure}
+
+\textbf{Theorem:} Every $r \times n$ Latin rectangle with $r \leq n$ can be extended to an $n \times n$ Latin square.
+
+\textbf{Proof} Define a bipartite graph with a vertex for each column ($X$), and a vertex for each number $1, 2, ..., n$ ($Y$). Add an edge from column $j$ to number $i$ if $i$ does not appear in column $j$.
+
+Each vertex in $X$ will be connected with $n-r$ vertices on the other side. Hence, $G$ is $(n-r)$-regular and has $n-r$ perfect matchings. These give $n-r$ rows which we can add to make the Latin square.
 
 \end{document}
