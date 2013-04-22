@@ -18,13 +18,15 @@
 \usepackage{caption}
 \usepackage[linktoc=section, colorlinks=true, linkcolor=blue, urlcolor=blue]{hyperref}
 \usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{algorithm2e}
 \usepackage{tikz}
-\usetikzlibrary{decorations.pathreplacing, matrix, arrows}
+\usetikzlibrary{decorations.pathreplacing, matrix, arrows, positioning}
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 
 
 \newcommand{\bigO}{\ensuremath{\mathcal{O}}}% big-O notation/symbol
+\DeclareMathOperator*{\argmax}{argmax}
 
 \title{MATH 340 - Discrete Structures 2}
 \author{McGill University -  Winter 2013}
@@ -221,12 +223,12 @@ A graph $G$ is \textit{bipartite} if $\exists$ a partition $(X,Y)$ of $V(G)$ suc
 
 \textbf{Theorem:} $G$ is bipartite $\Leftrightarrow$ $G$ contains no odd cycles.
 
-\textbf{Proof:} Without loss of generality, assume $G$ is connected, since $G$ is bipartite $\Rightarrow$ each of its components are.
+\textbf{Proof:} WLOG\footnote{Without loss of generality}, assume $G$ is connected, since $G$ is bipartite $\Rightarrow$ each of its components are.
 
 ($\Rightarrow$) Suppose $G$ is bipartite, with bipartition $(X,Y)$. Let $v_0 e_1 v_1 e_2 ... e_n v_n$ be an odd cycle (n is odd). Assume $v_0 \in X$. We then show that for $0 \leq k < \frac{n}{2}$, $v_{2k} \in X$. Assume inductively that $V_{2k-2} \in X$, where $k \geq 1$. Then $v_{2k-1}$ lies in $Y$, since $e_{2k-1}$ has endpoints in both $X$ and $Y$. But $v_{2k-1}$ inplies $v_{2k} \in X$  for the same reason. In particular, $v_{n-1} \in X$, but this means the two endpoints of $e_n$, $v_0$ and $v_{n-1}$, both lie in $X$. This contradict the fact that $G$ is bipartite.
 
 \begin{wrapfigure}{l}{0.24\textwidth}
-	\begin{tikzpicture}[scale]
+	\begin{tikzpicture}
 		\tikzstyle{v}=[circle,fill=black,inner sep=0pt]
 		\node (v0) at (0,0.3) {v};
 		\node[v] (v1) at (0,0) {1};
@@ -267,7 +269,9 @@ Then, letting $X=\bigcup_{i \text{ even}} D_i$ and $Y=\bigcup_{i \text{ odd}} D_
 
 {\hfill $\blacksquare$}
 
-\section{Stable Marriages}
+\section{Matching}
+
+\subsection{Stable Marriages}
 We have $n$ boys and $n$ girls. Each boy has an ordered list of girls and vice versa.
 
 A set $M$ of marriages is \textit{stable} if there is no boy-girl pair who prefer each other to their current pairings in $M$. We call this situation an unstable (unblocking) pair [Figure~\ref{unstable_pair}].
@@ -287,7 +291,7 @@ A set $M$ of marriages is \textit{stable} if there is no boy-girl pair who prefe
 	\label{unstable_pair}
 \end{figure}
 
-\subsection{Example}
+\subsubsection{Example}
 In the following example [Figure~\ref{example_marriage}], we have 3 boys and 3 girls, each with their own preference list, but the given matching isn't a stable marriage.
 \begin{figure}[h]
 	\centering
@@ -349,8 +353,6 @@ But when trying again, we can easily find two stable configuations [Figure~\ref{
 	\label{stable_configs}
 \end{figure}
 
-
-\subsection{Gale-Shapley}
 
 Do stable matchings exist in general?
 
@@ -465,6 +467,7 @@ Thus, $B_j$ prefers $G_j$ to $G_i$ and $G_j$ prefers $B_j$ to $B^-(G_j)$, theref
 {\hfill $\blacksquare$}
 
 \subsection{Matching}
+\label{sec:matching}
 
 A \textit{matching} in a graph $G(V,E)$ is a set $M \subseteq E$ of vertex-disjoint edges, i.e., each vertex of $G$ is the endpoint of at most one edge in $M$.
 
@@ -832,6 +835,8 @@ We also have that $|E| = d|X| = d|Y|$ since $deg(x)=d \; \forall x \ in X$. Cons
 
 Thus $|A| \leq |N(A)|$. So $G$ satisfies Hall's Condition and hence has a perfect matching.
 
+{\hfill $\blacksquare$}
+
 \subsubsection{Latin Squares}
 An $r \times n$ grid is a \textit{Latin Rectangle} if the numbers in each row and column are distinct.
 
@@ -850,5 +855,530 @@ An $r \times n$ grid is a \textit{Latin Rectangle} if the numbers in each row an
 \textbf{Proof} Define a bipartite graph with a vertex for each column ($X$), and a vertex for each number $1, 2, ..., n$ ($Y$). Add an edge from column $j$ to number $i$ if $i$ does not appear in column $j$.
 
 Each vertex in $X$ will be connected with $n-r$ vertices on the other side. Hence, $G$ is $(n-r)$-regular and has $n-r$ perfect matchings. These give $n-r$ rows which we can add to make the Latin square.
+
+{\hfill $\blacksquare$}
+
+\subsubsection{Systems of Distinct Representatives}
+
+Let $Y = \{y_1, y_2, ..., y_m\}$ and $S_1, S_2, ..., S_n \subseteq Y$. $D = \{y_1, y_2, ..., y_k \} \subseteq Y$ is a \textit{system of representatives} (SDR) if $y_i \in S_i \; \forall i$.
+
+\textbf{Theorem:} An SDR exists for a set family $\mathcal{S} = \{s_1, s_2, ... s_n\} \Leftrightarrow$ for any $k$ sets from $\mathcal{S}$, their union contains at least $k$ elements.
+
+\textbf{Proof:}
+($\Rightarrow$) Since if $S_1, ..., S_k$ are k sets and they have representatives $y_1, ..., y_k$, then:
+
+$$ \bigcup_{i=1}^k S_i \supseteq {y_1, ..., y_k} \Rightarrow |\bigcup_{i=1}^k S_i| \geq k$$
+
+($\Leftarrow$) Set up a bipartite graph $G = (X \cup Y, E)$, where each $x_i \in X$ reps $S_i$. Put edges $x_i y_j$ if $y_j \in S_i$. Then an SDR corresponds precisely to a perfect matching, and Hall's Condition is just the Condition that for any k sets in $\mathcal{S}$, their union contains at least k elements.
+
+{\hfill $\blacksquare$}
+
+\subsubsection{Maximum Bipartite Matching}
+
+Given a $0-1 \; m \times n$ matrix M, its \textit{term rank}, denoted $\tau(M)$, is the largest number of 1's that can be chosen such that no two lie on the same line (row or column). Call such a set of entries a "\textit{packing of 1's in M}".
+
+\begin{wrapfigure}{r}{0.23\textwidth}
+	\vspace*{-0.5cm}
+	\caption*{Example}
+	\begin{tikzpicture}
+	\matrix (m) [matrix of math nodes, left delimiter=(, right delimiter=)] (m){
+		1 & 0 & 0 & 1 & 0 & 0 \\
+		1 & 0 & 0 & 0 & 0 & 1  \\
+		0 & 0 & 0 & 1 & 0 & 1 \\
+		0 & 1 & 1 & 0 & 1 & 1 \\
+		1 & 0 & 0 & 1 & 0 & 1 \\
+	};
+	\draw[rounded corners, green]  (m-4-1.north west) rectangle (m-4-6.south east);
+	\draw[rounded corners, green]  (m-1-1.north west) rectangle (m-5-1.south east);
+	\draw[rounded corners, green]  (m-1-4.north west) rectangle (m-5-4.south east);
+	\draw[rounded corners, green]  (m-1-6.north west) rectangle (m-5-6.south east);
+	\end{tikzpicture}
+	\vspace*{-1cm}
+\end{wrapfigure}
+
+Note that the four circled lines contain all the ones, therefore $\tau(M) \leq 4$, since we can choose at most one 1 from each line.
+
+The \textit{cover number} of M, denoted $\gamma(M)$, is the minimum number of line whose deletion results in a 0-matrix. That is, these lines "cover" all the 1's.
+
+For any M, $\tau(M) \leq \gamma(M)$. Since, again, we can have at most one 1 on each of the $\gamma(M)$ lines of the cover.
+
+\textbf{Theorem:} For any $0-1$ matrix M, $\tau(M) = \gamma(M)$
+
+\textbf{Proof:} We have already shown that $\tau(M) \leq \gamma(M)$. With now need to show that $\tau(M) \geq \gamma(M)$. Suppose $\gamma(M)=r+c$, where r and c correspond to the number of rows and columns in our cover respectively. WLOG, we can assume that the cover used rows $1, 2, ..., r$ and columns $1, 2, ..., c$, since we can swap rows and columns. In the previous example, this would look like Figure~\ref{swapped_matrix1}, and in a general case, it would look like Figure~\ref{swapped_matrix2}
+
+\begin{figure}[H]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[Previous example]{
+		\begin{tikzpicture}
+		\matrix (m) [matrix of math nodes, left delimiter=(, right delimiter=), ampersand replacement=\&] (m){
+			0 \& 0 \& 1 \& 1 \& 1 \& 1 \\
+			1 \& 0 \& 1 \& 0 \& 0 \& 0 \\
+			0 \& 1 \& 1 \& 0 \& 0 \& 0 \\
+			1 \& 1 \& 0 \& 0 \& 0 \& 0 \\
+			1 \& 1 \& 1 \& 0 \& 0 \& 0 \\
+		};
+		\draw[rounded corners, green]  (m-1-1.north west) rectangle (m-1-6.south east);
+		\draw[rounded corners, green]  (m-1-1.north west) rectangle (m-5-1.south east);
+		\draw[rounded corners, green]  (m-1-2.north west) rectangle (m-5-2.south east);
+		\draw[rounded corners, green]  (m-1-3.north west) rectangle (m-5-3.south east);
+		\end{tikzpicture}
+		\label{swapped_matrix1}
+	} \hspace*{1cm}
+	\subfigure[General case]{
+		\begin{tikzpicture}
+		\matrix (m) [matrix of math nodes, nodes in empty cells, text height=1.5ex, text width=1ex, left delimiter=(, right delimiter=), ampersand replacement=\&] (m){
+			\& \& \& \& \& \& \& \\
+			\& \& \& \& \& \& \& \\
+			\& \& \& \& \& \& \& \\
+			\& \& \& \& \& \& \& \\
+			\& \& \& \& \& \& \& \\
+			\& \& \& \& \& \& \& \\
+			\& \& \& \& \& \& \& \\
+		};
+		\draw[rounded corners, green]  (m-1-1.north west) rectangle (m-1-8.south east);
+		\draw[rounded corners, green]  (m-2-1.north west) rectangle (m-2-8.south east);
+		\draw[rounded corners, green]  (m-4-1.north west) rectangle (m-4-8.south east);
+		\draw[rounded corners, green]  (m-1-1.north west) rectangle (m-7-1.south east);
+		\draw[rounded corners, green]  (m-1-2.north west) rectangle (m-7-2.south east);
+		\draw[rounded corners, green]  (m-1-4.north west) rectangle (m-7-4.south east);
+		\draw[rounded corners, blue]  (m-5-5) rectangle (m-7-8);
+		\draw[rounded corners, red]  (m-5-1) rectangle (m-7-4);
+		\draw[rounded corners, red]  (m-1-5) rectangle (m-4-8);
+		\node[right=4pt of m-3-5.north,font=\Huge] {R};
+		\node[right=2pt of m-6-5,font=\Huge] {0};
+		\node[right=-1pt of m-6-1,font=\Huge] {C};
+		\node[above=2pt of m-1-1] (top-1) {1};
+		\node[above=2pt of m-1-2] (top-1) {2};
+		\node[above=2pt of m-1-3] (top-1) {...};
+		\node[above=2pt of m-1-4] (top-1) {c};
+		\node[above=2pt of m-1-6] (top-1) {...};
+		\node[above=2pt of m-1-8] (top-1) {n};
+		\node[left=12pt of m-1-1] (top-1) {1};
+		\node[left=12pt of m-2-1] (top-1) {2};
+		\node[left=12pt of m-3-1] (top-1) {$\vdots$};
+		\node[left=12pt of m-4-1] (top-1) {r};
+		\node[left=18pt of m-5-1.south] (top-1) {$\vdots$};
+		\node[left=10pt of m-7-1] (top-1) {m};
+		\end{tikzpicture}
+		\label{swapped_matrix2}.
+	}
+	\caption{Swapping rows and columns so that we get a 0-submatrix in the bottom right}
+\end{figure}
+
+\textsc{Note:} no element of R is in a column line with an element of C.
+
+\textbf{Idea:} combine a packing of 1's in R with a packing in C.
+
+\textbf{Claim:} We can pack r 1's in R and c 1's in C, therefore we get a packing of size $r+c$. We'll show this for R, and the idea for C will be similar.
+
+Create a bipartite graph G where X corresponds to rows $1, 2, ..., r$ and Y corresponds to columns $c+1, c+2, ..., n$. Put an edge between row-i-vertex and col-j-vertex if $M_{ij}=1$. Packing r 1's in R corresponds to picking one 1 in each row of R, so we don't use the same column twice. This is equivalent to choosing a matching that matches every vertex in X (row vertices).
+
+Due to Hall's Theorem, we know that there is such a matching as long as Hall's condition holds. Suppose Hall's condition fails for some $A \subset X = [r] = \{1, 2, ..., r\}$ (i.e., $|N(A)|<|A|$ where $N(A)$ is the set of columns $j \in \{c+1, ..., n\}$ such that $M_{ij}=1$ for some $i \in A$). Hence, we get another line cover from $\{\text{col } 1, ..., c\} \cup \{row 1, ..., r-A\} \cup \{\text{cols from } N(A)\}$, and this is smaller if $|N(A) < |A|$. $\Rightarrow\Leftarrow$
+
+{\hfill $\blacksquare$}
+
+\subsubsection{Market Clearing Prices}
+(This section is very dodgy, needs to be reworked)
+
+Consider $n$ sellers, each with one house to sell and $n$ buyers, each wanting a single house. Suppose buyer $i$ values seller $j$'s house at $V_ij \geq 0$. One approach is to match buyers to sellers to maximize total valuations. In graph theory, find a perfect matching $M$ which maximizes $v(M) = \sum\limits_{i,j \in M} V_{ij}$.
+
+Note that here, we ignore the sellers. How low of a price is the seller willing to accept?
+
+Suppose seller $j$ asks for price $p_j$ for the house. What will buyers do in response to the price vector $(p_1, p_2, ..., p_n)$? Each buyer $i$ views a payoff for each house $j$ of $V_{ij}-p_j$. Call seller $j_0$ preffered for buyer $i$, if this house maximizes their payoff (i.e., $j_0 = \argmax\limits_{j} (V_{ij}-p_j)$)
+
+Can we assign houses to buyers such that everyone buys from a preferred seller? Sometimes yes, sometimes no.  Yes precisely when the preferred graph has a perfect matching.
+
+Define $G_p = (X \cup Y, E)$ as the a preferred graph where $i,j \in E$ if $j$ is preferred by seller of $i$. $X =$ buyers $i$ and $Y =$ sellers. A vector of prices $P$ is called \textit{market-clearing} if $G_p$ has a perfect matching.
+
+\textbf{Theorem:} There exists market clearing prices
+
+\textbf{Proof (by algorithm)}: 
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\While{$G_p$ does not have a perfect matching $M$}{
+		let $A \subseteq X$ such that $|N(A)|<|A|$\;
+		\ForEach{$j \in N(A)$}{
+			$P_j \leftarrow P_j + 1$\;
+		}
+		
+		\If{$P_{min}>0$}{
+			subtract $P_{min}$ from all prices (to keep $P_{min}$ at 0)\;
+		}
+	}
+\end{algorithm}
+
+The algorithm terminates: Define a potential function associated with each state of the algorithm. For each $i \in $ Buyers or Sellers:
+
+$$ \Phi(i) = \begin{cases}
+p_i & \text{if } i \in \text{ Sellers} \\
+\max\limits_{j \in \text{ Sellers}} (V_{ij}-p_j) & \text{if } i \in \text{ Buyers}
+\end{cases} $$
+
+Note:
+\begin{enumerate}[(i)]
+	\item $\Phi(i) \geq 0$
+	\item Let $\Phi(P) = \sum\limits_{i \in \text{Buyers} \cup \text{Sellers}} \Phi(i)$, initially, since $P=(0,0,...,0)$, $\Phi(P) = \sum\limits_{i \in \text{Buyers}} V_{i\max} < \infty$
+\end{enumerate}
+
+\textbf{Claim:}  On each iteration, $\Phi(P)$ decreases, and hence the algorithm terminates. This is true because in step (2), we subtract $P_{min}$ from all sellers, so each of their potential decreases by $P_{min}$. Thus we have a total decrease of $nP_{min}$. By the same argument, all payoffs increased for buyers.  Hence an increase of $nP_{min}$. This gives a net effect of 0.
+
+In step (1), we increase the potential of each seller in $N(A)$ by 1, for a total increase of $|N(A)|$. But each buyer in $A$ just had its maximum payoff decreased by 1, which gives a net decrease of $|A|$. Therefore, the new $\Phi(p)$ decreases by $|A|-|N(A)|>0$.
+
+{\hfill $\blacksquare$}
+
+
+\section{Vertex Cover}
+
+For a graph $G = (V,E)$, a subset $C \subseteq V$ is a \textit{vertex cover} if every edge has at least one endpoint in C.
+
+\textsc{Note:} $V-C$ is a set of mutually non-adjacent vertices, called \textit{independent set} or \textit{stable set}.
+
+\textsc{Observation:} For any matching M and vertex cover C, $|M| \leq |C|$, since every vertex can only be used once, and every edge in our matching will use one of the vertices of C.
+
+\textbf{Konig's Theorem:} In a bipartite graph, the size of a maximum matching $=$ the size of a minimum vertex cover.
+
+\textbf{Proof:} We show this by reduction to the term rank problem. If $|X|=m$ and $|Y|=n$, then define an $m 
+\times n \; 0-1$ matrix A where $A_{ij} = 1 \Leftrightarrow X_i Y_j \in E$. So rows of A correspond to vertices in X, columns of A correspond to vertices in Y, and 1's in A correspond to edges in G.
+
+First, we can show that a maximum matching in G corresponds to picking the maximum number of 1's in A (edges in G) such that no two lie on the same row or column (not using the same vertex from X or Y more than once), and this value is $\tau(A)$. On the other hand, we can show that a minimum vertex cover corresponds to choosing the least number of vertices from X (rows) and Y (columns) so as to cover all the 1's (edges), and this corresponds to $\gamma(A)$. Lastly, from the previous theorem, we know that $\tau(A)=\gamma(A)$, therefore $|M|=|C|$.
+
+{\hfill $\blacksquare$}
+
+\subsection{Perfect phylogenetic trees (PPT)}
+
+Given m species, each exhibiting some characteristics from a set of n characteristics, encode this information as an $m \times n \; 0-1$ matrix M, where $M_{ij}=1$ if species i has characteristic j, and 0 otherwise.
+
+\begin{figure}[H]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[Species-Chars Matrix]{
+		\begin{tikzpicture}
+		\matrix (m) [matrix of math nodes, nodes in empty cells, text width=2ex, text height=2ex, ampersand replacement=\&] (m){
+			S_1 \&\& 1 \& 1 \& 0 \& 0 \& 0 \\
+			S_2 \&\& 0 \& 0 \& 1 \& 0 \& 0 \\
+			S_3 \&\& 1 \& 1 \& 0 \& 0 \& 1 \\
+			S_4 \&\& 0 \& 0 \& 1 \& 1 \& 0 \\
+			S_5 \&\& 0 \& 1 \& 0 \& 0 \& 0 \\
+		};
+		\node[above=2pt of m-1-1, font=\small] (top-1) {Species};
+		\node[above=2pt of m-1-5, font=\small] (top-1) {Chars.};
+		\end{tikzpicture}
+	} \hspace*{2cm}
+	\subfigure[PPT]{
+		\begin{tikzpicture}
+		\tikzstyle{v}=[circle,fill=blue,inner sep=1.5pt]
+		\tikzstyle{e}=[green, thick]
+		\node[v] (r) at (0,0) {};
+		\node[v] (v2) at (-1,-1) {};
+		\node[v] (v3) at (1,-1) {};
+		\node[v] at (-1.5,-2) (s4) {};
+		\node[v] at (-0.5,-2) (s2) {};
+		\node[v] at (0.5,-2)  (s5){};
+		\node[v] (v4) at (1.5,-2) {};
+		\node[v] at (1,-3) (s1) {};
+		\node[v] at (2,-3) (s3) {};
+		\node[below=0pt of s1] {$S_1$};
+		\node[below=0pt of s2] {$S_2$};
+		\node[below=0pt of s3] {$S_3$};
+		\node[below=0pt of s4] {$S_4$};
+		\node[below=0pt of s5] {$S_5$};
+		\node[above=0pt of r] {$root$};
+		\draw[e] (r) edge node[sloped,above]{$c_3$} (v2);
+		\draw[e] (v2) edge node[sloped,above]{$c_4$} (s4);
+		\draw[e] (v2) edge (s2);
+		\draw[e] (r) edge node[sloped,above]{$c_2$} (v3);
+		\draw[e] (v3) edge (s5);
+		\draw[e] (v3) edge node[sloped,above]{$c_1$} (v4);
+		\draw[e] (v4) edge (s1);
+		\draw[e] (v4) edge node[sloped,above]{$c_5$} (s3);
+		\end{tikzpicture}
+	}
+\end{figure}
+
+A PPT is a rooted tree with the following properties:
+\begin{enumerate}[i)]
+	\item Exactly m leaves, one for each species $S_i$
+	\item Each characteristic labels one edge of the tree (some edges can be blank)
+	\item For each species, the path from the root to $S_i$ contains exactly the labels for $S_i$'s characteristics
+\end{enumerate}
+
+Let $C_i$ be the set of species with characteristic i. The family $\mathcal{F}=\{C_1, ..., C_n\}$ is nested if $\forall i, j$:
+\begin{enumerate}[a)]
+	\item $S_i$ and $S_j$ are disjoint \\
+	OR \vspace*{-0.3cm}
+	\item They are comparable (i.e., $S_i \subseteq S_j$ or $S_j \subseteq S_i$)
+\end{enumerate}
+
+\textbf{Theorem:} There exists a PPT $\Leftrightarrow$ $\mathcal{F}$ is nested
+
+\textbf{Proof:} Beyond the scope of this course.
+
+What if $\mathcal{F}$ is not nested? Try to find a large subset X of characteristics such that their corresponding family is nested. That is, restrict to the X-columns of M, then get a PPT. 
+
+How to find X? Create a graph with a vertex for each $C_i$ (i.e., each characteristic). Put an edge $ij \in E(G)$ if $C_i$ and $C_j$ are not nested.
+
+Finding the set X corresponds to finding a largest stable set in G. This is equivalent to finding a minimum vertex cover (X is stable $\Leftrightarrow$ V-X is a cover).
+
+\section{Graph coloring}
+\subsection{Edge coloring}
+
+An \textit{edge coloring} of a graph G is a function $c: E \rightarrow \mathbb{N}$ such that $c(e_1) \ne c(e_2)$ for any pair of edges $e_1, e_2$ with a common end point. The \textit{edge-chromatic number} $\chi^E(G)$ is the minimum number of colors needed to edge-color G.
+
+\begin{figure}[H]
+	\centering
+	\setcounter{subfigure}{0}
+	\subfigure[6 colors (bad)]{
+		\begin{tikzpicture}
+		\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+		\tikzstyle{e}=[green, thick]
+		\tikzstyle{c}=[black]
+		\node[v] (v1) at (0,0) {};
+		\node [v] (v2) at (-1.5,-1) {};
+		\node [v] (v4) at (-1,-2.5) {};
+		\node [v] (v6) at (1,-2.5) {};
+		\node [v] (v7) at (1.5,-1) {};
+		\node [v] (v5) at (0.5,-1.5) {};
+		\node [v] (v3) at (-0.5,-1.5) {};
+		\draw [e] (v1) edge node[c] {1} (v2);
+		\draw [e] (v3) edge node[c] {3} (v2);
+		\draw [e] (v2) edge node[c] {2} (v4);
+		\draw [e] (v4) edge node[c] {1} (v3);
+		\draw [e] (v3) edge node[c] {2} (v5);
+		\draw [e] (v5) edge node[c] {1} (v6);
+		\draw [e] (v6) edge node[c] {3} (v4);
+		\draw [e] (v7) edge node[c] {2} (v6);
+		\draw [e] (v5) edge node[c] {3} (v7);
+		\draw [e] (v7) edge node[c] {4} (v1);
+		\draw [e] (v1) edge node[c] {5} (v5);
+		\draw [e] (v1) edge node[c] {6} (v3);
+		\end{tikzpicture}
+	} \hspace*{2cm}
+	\subfigure[4 colors (better)]{
+		\begin{tikzpicture}
+		\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+		\tikzstyle{e}=[green, thick]
+		\tikzstyle{c}=[black]
+		\node[v] (v1) at (0,0) {};
+		\node [v] (v2) at (-1.5,-1) {};
+		\node [v] (v4) at (-1,-2.5) {};
+		\node [v] (v6) at (1,-2.5) {};
+		\node [v] (v7) at (1.5,-1) {};
+		\node [v] (v5) at (0.5,-1.5) {};
+		\node [v] (v3) at (-0.5,-1.5) {};
+		\draw [e] (v1) edge node[c] {1} (v2);
+		\draw [e] (v3) edge node[c] {3} (v2);
+		\draw [e] (v2) edge node[c] {4} (v4);
+		\draw [e] (v4) edge node[c] {1} (v3);
+		\draw [e] (v3) edge node[c] {4} (v5);
+		\draw [e] (v5) edge node[c] {1} (v6);
+		\draw [e] (v6) edge node[c] {2} (v4);
+		\draw [e] (v7) edge node[c] {3} (v6);
+		\draw [e] (v5) edge node[c] {2} (v7);
+		\draw [e] (v7) edge node[c] {4} (v1);
+		\draw [e] (v1) edge node[c] {3} (v5);
+		\draw [e] (v1) edge node[c] {2} (v3);
+		\end{tikzpicture}		
+	}
+\end{figure}
+
+\textsc{Observation:} $\chi^E(G) \geq \max\limits_{v \in V} d(v)=\Delta$, since edges touching vertex v receive distinct colors.
+
+\textsc{Note:} Any color class (edges with some color i) forms a matching.
+
+\textbf{Theorem:} For any graph G, $\chi^E(G) \leq 2\Delta-1$
+
+\textbf{Proof (by greedy algorithm):} While there is an uncolored edge $e=(u,v)$, let $C_u$ be the colors used already at u. Define $C_v$ similarly. We know that $|C_u| \leq \Delta-1$ and  $|C_v| \leq \Delta-1$. Hence, $\{1, 2, ..., 2\Delta-1\}-(C_u \cup C_v)$ is not empty since $|C_u \cup C_v| \leq 2\Delta-2$. We simply pick a color t in this set and give $e$ that color. End while.
+
+{\hfill $\blacksquare$}
+
+Can we do better than $\chi^E(G) \leq 2\Delta-1$?
+
+\textbf{Theorem (Vizing):} For (simple) graph $G$, $\chi^E(G) \leq \Delta+1$
+
+\textbf{Proof:} Beyond this course
+
+\textbf{Theorem (K\"{o}nig):} For a bipartite graph $G$, $\chi^E(G) = \Delta$
+
+\textbf{Proof (by induction on $|E|$):} We already have that $\chi^E(G) \geq \Delta$. We then show that $\chi^E(G) \leq \Delta$. 
+
+If $|E|=0$, it's trivial to show.
+
+Suppose $e=(u,v) \in E$ and consider $G'=G-e$. By induction, $G'$ has an edge coloring $C$ using at most $\Delta$ colors. Since $deg_G'(u) \leq \Delta-1$, there is some color $\alpha$ not used by $C$ at $u$. Similarly, there is a missing color $\beta$ at $v$. If $\alpha=\beta$, then set $c(e)=\alpha$ to get a coloring of G. Else, if $\alpha \ne \beta$, WLOG, $\alpha=1$, $\beta=2$ (Figure~\ref{konig_coloring}).
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	\tikzstyle{v}=[circle,fill=black,inner sep=1pt]
+	\tikzstyle{e}=[green, thick]
+	\tikzstyle{c}=[black, near end]
+	\node[v] (v1) at (-2,0) {};
+	\node[v] (v2) at (2,0) {};
+	\node (v10) at (-3,2) {};
+	\node (v9) at (-2.5,2) {};
+	\node (v8) at (-2,2) {};
+	\node (i1) at (-1.5,2) {};
+	\node (v7) at (-1,2) {};
+	\node (v6) at (1,2) {};
+	\node (v5) at (1.5,2) {};
+	\node (v4) at (2,2) {};
+	\node (i2) at (2.5,2) {};
+	\node (v3) at (3,2) {};
+	\draw [e] (v1) edge (v2);
+	\draw [e] (v2) edge node[c] {$\Delta$} (v3);
+	\draw [white] (v2) edge node[c] {...} (i2);
+	\draw [e] (v2) edge node[c] {4} (v4);
+	\draw [e] (v2) edge node[c] {3} (v5);
+	\draw [e] (v2) edge node[c] {1} (v6);
+	\draw [e] (v1) edge node[c] {$\Delta$} (v7);
+	\draw [white] (v1) edge node[c] {...} (i1);
+	\draw [e] (v1) edge node[c] {4} (v8);
+	\draw [e] (v1) edge node[c] {3} (v9);
+	\draw [e] (v1) edge node[c] {2} (v10);
+	\node[below=0pt of v1] {$u$};
+	\node[below=0pt of v2] {$v$};
+	\end{tikzpicture}
+	\caption{$\alpha=1$ not used at $u$ and $\beta=2$ not used at $v$. $\Delta-1$ colors used at each $X$ and $Y$}
+	\label{konig_coloring}
+\end{figure}
+
+Consider the subgraph $H$ induced by the edges of color 1 and 2. Call $M_i$ the color class for color $i$. By observing that in general, any color class forms a matching, $M_1$ and $M_2$ must be matchings, therefore, each component of $H$ must be a path or a cycle (see Section~\ref{sec:matching}).
+
+\textbf{Claim:} The component containing $u$ is a path and doesn't contain $v$. 
+
+\begin{wrapfigure}{l}{0.25\textwidth}
+	\vspace*{-0.5cm}
+	\begin{tikzpicture}[scale=0.65]
+	\tikzstyle{v}=[circle,fill=black,inner sep=0pt]
+	\tikzstyle{e}=[green, thick]
+	\tikzstyle{c}=[black]
+	
+	\draw[e] (-2,0) ellipse (1 and 3);
+	\draw[e] (2,0) ellipse (1 and 3);
+	\node[v] (x) at (-2,2) {u};
+	\node (v1) at (2,2) {};
+	\node (v2) at (-2,1) {};
+	\node (v3) at (2,1) {};
+	\node (v4) at (-2,0) {};
+	\node (v5) at (2,0) {};
+	\node (v6) at (-2,-1) {};
+	\node (v7) at (2,-1) {};
+	\node (v8) at (-2,-2) {};
+	\node[v] (y) at (2,-2) {v};
+	\node[right=-2pt of y] {v};
+	\node[left=-2pt of x] {u};
+	\draw[blue]  (x) edge node[c] {2} (v1);
+	\draw[blue]  (v1) edge node[c] {1} (v2);
+	\draw[blue]  (v2) edge node[c] {2} (v3);
+	\draw[blue]  (v4) edge node[c] {1} (v3);
+	\draw[blue]  (v4) edge node[c] {2} (v5);
+	\draw[blue]  (v5) edge node[c] {1} (v6);
+	\draw[blue]  (v7) edge node[c] {2} (v6);
+	\draw[blue]  (v7) edge node[c] {1} (v8);
+	\draw[red, dashed]  (v8) edge node[c] {2} (y);
+	\end{tikzpicture}
+	\vspace*{-0.5cm}
+\end{wrapfigure}
+
+This is because $u$ is not incident to an edge of color $1$, so $deg_H(u)=1$. The path only has colors 1 and 2, alternating, starting at $u$ with the color 2. If $v$ is in the same component,, then since the edges in the path are alternating between 1 and 2, it would mean that $v$ is touching an edge of color 2, but that can't be.
+
+Then, all we need to do is swap the colors 1 and 2 on this path containing $u$, which gives us a new valid edge coloring for G, and allows us to now color $e$ with the color 2.
+
+{\hfill $\blacksquare$}
+
+\subsubsection{Applications}
+
+\textbf{Sports Scheduling}: Each pair of $n$ teams should play each other on some Sunday. How many Sundays does it take? \textsc{Answer:} $\chi^E(K_n)$ where $K_n$ is a complete graph on $n$ vertices.
+
+\textbf{Job scheduling:} We have $m$ jobs $J_1, ..., J_m$ and $n$ processors. Job $J_i$ must be processed by every processor in set $S_i$ (order doesn't matter). How to process the jobs in minimum time? \textsc{Answer:} bipartite edge coloring. Partitioning G into a minimum number of matchings $= \chi^E(G)$.
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+	\vspace*{-0.5cm}
+	\caption*{\hspace*{1.5cm}Crossbar}
+	\begin{tikzpicture}[scale=0.7]
+	\draw[step=1,black,thin,xshift=0.5cm,yshift=0.5cm] (0.5,0.5) grid (5.5,5.5);
+	\node at (1.5,.5) {1};
+	\node at (2.5,.5) {2};
+	\node at (3.5,.5) {3};
+	\node at (4.5,.5) {$\dots$};
+	\node at (5.5,.5) {n};
+	\node at (0.5,1.5) {n};
+	\node at (0.5,2.5) {$\vdots$};
+	\node at (0.5,3.5) {3};
+	\node at (0.5,4.5) {2};
+	\node at (0.5,5.5) {1};
+	\node[rotate=90] at (0,3.5) {Inputs};
+	\node at (3.5,0) {Outputs};
+	\end{tikzpicture}
+\end{wrapfigure}
+
+\textbf{Switches:} network design involves a graph G and making decisions about how "large" each edge and vertex should be. We have to realize that what looks like a node is often another network when you zoom in on it. We must choose how much to simplify. The basic building blocks are interconnected switches. \textsc{Goal:} any pattern of requests from inputs to outputs should be "connectible" (i.e.: any matching from inputs to outputs).
+
+Using a crossbar, we can achieve any communication, but the cross-points are expensive, and there are $\bigO(n^2)$ of them. How to do better?
+
+\subsubsection{3-stage Clos network}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+	
+	\draw[green]  (-3,3) rectangle node {$p \times m$} (-2,2);
+	\draw[green]  (-3,1) rectangle node {$p \times m$}  (-2,0);
+	\node[green] at (-2.5,-1) {$\vdots$};
+	\draw[green]  (-3,-2) rectangle node {$p \times m$} (-2,-3);
+	\draw[red, decorate,decoration={brace,amplitude=10pt}] (-3.5,-2.5) -- (-3.5,2.5) node [midway,xshift=-0.6cm] {$k$};
+	
+	\draw[green]  (1,3) rectangle node {$k \times k$} (2,2);
+	\draw[green]  (1,1) rectangle node {$k \times k$}  (2,0);
+	\node[green] at (1.5,-1) {$\vdots$};
+	\draw[green]  (1,-2) rectangle node {$k \times k$} (2,-3);
+	\draw [red, decorate,decoration={brace,amplitude=10pt}] (0.5,-2.5) -- (0.5,2.5) node [midway,xshift=-0.6cm] {$m$};
+	
+	\draw[green]  (5,3) rectangle node {$m \times p$} (6,2);
+	\draw[green]  (5,1) rectangle node {$m \times p$}  (6,0);
+	\node[green] at (5.5,-1) {$\vdots$};
+	\draw[green]  (5,-2) rectangle node {$m \times p$} (6,-3);
+	\draw [red, decorate,decoration={brace,amplitude=10pt}] (6.5,2.5) -- (6.5,-2.5) node [midway,xshift=0.6cm] {$k$};
+	
+	\draw[blue]  (-2,2.8) edge (1,2.8);
+	\draw[blue]  (-2,2.5) edge (1,0.8);
+	\draw[blue]  (-2,2.2) edge (1,-2.2);
+	\draw[blue]  (-2,0.8) edge (1,2.5);
+	\draw[blue]  (-2,0.5) edge (1,0.5);
+	\draw[blue]  (-2,0.2) edge (1,-2.5);
+	\draw[blue]  (-2,-2.2) edge (1,2.2);
+	\draw[blue]  (-2,-2.5) edge (1,0.2);
+	\draw[blue]  (-2,-2.8) edge (1,-2.8);
+	
+	\draw[blue]  (2,2.8) edge (5,2.8);
+	\draw[blue]  (2,2.5) edge (5,0.8);
+	\draw[blue]  (2,2.2) edge (5,-2.2);
+	\draw[blue]  (2,0.8) edge (5,2.5);
+	\draw[blue]  (2,0.5) edge (5,0.5);
+	\draw[blue]  (2,0.2) edge (5,-2.5);
+	\draw[blue]  (2,-2.2) edge (5,2.2);
+	\draw[blue]  (2,-2.5) edge (5,0.2);
+	\draw[blue]  (2,-2.8) edge (5,-2.8);
+	\end{tikzpicture}
+	\caption{A 3-stage clos network. Each square is a crossbar.}
+	\label{clos_network}
+\end{figure}
+
+\textbf{Claim:} For $p=m$, we can route any matching of size $n=pk$ from inputs to outputs.
+
+\textbf{Proof:} Create a $k \times k$ bipartite graph $G$. $X$ corresponds to the $k$ input boxes and $Y$ to the $k$ output boxes. For each "demand" from a matching, we put an edge in G. If the demand goes from input box $i$ to output box $j$, we put an edge from $i$ to $j$. We allow multiple edges.
+
+Note that $G$ is $(p=m)$-regular, and that the maximum degree is $p$, since we are looking at the situation where we have a perfect matching from inputs to outputs. We can therefore find a p-edge coloring by K\"{o}nig theorem (i.e., the edges of $G$ partition into perfect matchings, one for each color class). $E(G) = M_1 \cup M_2 \cup ... \cup M_p$. we can now route all the demands in $M_i$ via the middle stage box $i$.
+
+\textsc{Observation:} if $k=m=p=\sqrt{n}$, then we have $3k=3\sqrt{n}$ boxes, each with $\sqrt{n}\sqrt{n}=n$ crosspoints. This gives us a total of $\bigO(n^{\frac{3}{2}}) \ll \bigO(n^2)$.
+
+\subsubsection{Bene\v{s} network}
+
+Taking one step further, support $n=2^i$ for some $i$. Take a clos network with $p=m=2$ and $k=\frac{n}{2}$. Now, recurse on the two $\frac{n}{2} \times \frac{n}{2}$ boxes. The result is called a Bene\v{s} network and its number of crosspoints can be obtained via this recurrence: $ f(n) = n f(2) + 2 f\left(\frac{n}{2}\right) $. The number of crosspoints turns out to be $\bigO(n\log{n})$, almost linear.
+
+
+
+
 
 \end{document}
